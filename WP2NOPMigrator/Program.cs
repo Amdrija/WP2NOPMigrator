@@ -10,7 +10,15 @@ using MySqlConnector;
 using WP2NOPMigrator;
 
 Console.WriteLine("Initializing Migrator");
-string wordpressConnectionString = "Server=localhost;Database=sandzako;User=root;Password=admin;";
+if (Environment.GetCommandLineArgs().Length != 3)
+{
+    Console.WriteLine("You need to specify wordpress database and nopcommerce database connection strings as arguments.");
+    return;
+}
+
+
+string wordpressConnectionString = Environment.GetCommandLineArgs()[1];
+string nopCommerceConnectionString = Environment.GetCommandLineArgs()[2];
 
 Console.WriteLine("Loading Wordpress blog posts");
 List<WPBlog> wpBlogs = WPBlog.LoadBlogs(wordpressConnectionString);
@@ -18,7 +26,11 @@ Console.WriteLine("Finished loading Wordpress blog posts");
 List<BlogPost> blogPosts = wpBlogs.Select((wp) => new BlogPost(wp)).ToList();
 
 Console.WriteLine("Initializing DB context");
-var dbContext = new NopDbContext();
+
+var contextOptions = new DbContextOptionsBuilder<NopDbContext>()
+                     .UseSqlServer(nopCommerceConnectionString)
+                     .Options;
+var dbContext = new NopDbContext(contextOptions);
 
 Console.WriteLine("Adding blog posts to NOP Commerce");
 foreach (var blogPost in blogPosts)

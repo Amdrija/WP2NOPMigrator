@@ -10,10 +10,9 @@ namespace WP2NOPMigrator
         
         public DbSet<ActivityLog> ActivityLogs { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public NopDbContext(DbContextOptions<NopDbContext> options) : base(options)
         {
-            optionsBuilder.UseSqlServer(
-                @"Server=localhost;Database=nopcommerce_db;User Id=sa;Password=nopCommerce_db_password;Encrypt=false;");
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
