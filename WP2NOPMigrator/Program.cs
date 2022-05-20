@@ -78,6 +78,13 @@ using (var connection = new MySqlConnection(wordpressConnectionString))
     }
 }
 
-var nblog = new Blog(blogs.First());
+var nblog = new BlogPost(blogs.First());
+
+var dbContext = new NopDbContext();
+dbContext.BlogPosts.Add(nblog);
+dbContext.SaveChanges();
 var urlRecord = new UrlRecord(nblog);
+dbContext.UrlRecords.Add(urlRecord);
+dbContext.SaveChanges();
+
 Console.WriteLine(blogs.First().Meta.FeaturedTexts.Count);

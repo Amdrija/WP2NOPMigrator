@@ -1,47 +1,67 @@
 using System;
+using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 
 namespace WP2NOPMigrator
 {
-    public class Blog
+    public class BlogPost
     {
         public int Id { get; set; }
         public string Title { get; set; }
 
         public string Body { get; set; }
 
-        public string MetaKeywords = "";
+        public string MetaKeywords { get; set; }
 
         public string MetaTitle { get; set; }
 
-        public int LanguageId = 2;
+        public int LanguageId { get; set; }
 
-        public bool IncludeInSitemap = true;
+        public bool IncludeInSitemap { get; set; }
 
         public string BodyOverview { get; set; }
 
-        public bool AllowComments = true;
+        public bool AllowComments { get; set; }
 
-        public string Tags = "";
+        public string Tags { get; set; }
 
-        public DateTime? StartDateUtc = null;
+        public DateTime? StartDateUtc { get; set; }
         
-        public DateTime? EndDateUtc = null;
+        public DateTime? EndDateUtc { get; set; }
 
         public string MetaDescription { get; set; }
 
-        public bool LimitedToStores = false;
+        public bool LimitedToStores { get; set; }
 
         public DateTime CreatedOnUtc { get; set; }
 
-        public Blog(WPBlog wp)
+        public BlogPost()
+        {
+            this.MetaKeywords = "";
+            this.LanguageId = 2;
+            this.IncludeInSitemap = true;
+            this.AllowComments = true;
+            this.Tags = "";
+            this.StartDateUtc = null;
+            this.EndDateUtc = null;
+            this.LimitedToStores = false;
+        }
+        public BlogPost(WPBlog wp)
         {
             this.Title = wp.Title;
             this.Body = wp.Content;
+            this.MetaKeywords = "";
             this.ConstructBody(wp);
             this.MetaTitle = wp.Meta.MetaTitle;
-            this.BodyOverview = wp.Excerpt.Length > 0 ? wp.Excerpt : wp.Meta.MetaDescription;
+            this.LanguageId = 2;
+            this.IncludeInSitemap = true;
+            this.BodyOverview = wp.Excerpt.Length > 0 ? wp.Excerpt : $"<p>{wp.Title}</p>";
+            this.AllowComments = true;
+            this.Tags = "";
+            this.StartDateUtc = null;
+            this.EndDateUtc = null;
             this.MetaDescription = wp.Meta.MetaDescription;
+            this.LimitedToStores = false;
             this.CreatedOnUtc = wp.DateGMT;
         }
         
@@ -82,7 +102,7 @@ namespace WP2NOPMigrator
             }
 
             tableOfContents += "</ul>";
-            newBody = newBody.Replace("[toc]", tableOfContents);
+            newBody = newBody.Replace("[toc]", $"<div class=\"table-of-contents\">{tableOfContents}</div>");
             
             return newBody;
         }
@@ -93,7 +113,7 @@ namespace WP2NOPMigrator
             int i = 0;
             foreach (var featuredText in wp.Meta.FeaturedTexts)
             {
-                newBody = newBody.Replace($"[featured_text position=\"{i}\"]", featuredText);
+                newBody = newBody.Replace($"[featured_text position=\"{i}\"]", "<div class=\"featuredText\">" + featuredText + "</div>");
                 i++;
             }
 

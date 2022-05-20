@@ -2,20 +2,32 @@ namespace WP2NOPMigrator
 {
     public class UrlRecord
     {
-        public string EntityName = "BlogPost";
+        public int Id { get; set; }
+        
+        public string EntityName { get; set; }
 
         public string Slug { get; set; }
 
         public int EntityId { get; set; }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; }
 
-        public int LanguageId = 2;
+        public int LanguageId { get; set; }
 
-        public UrlRecord(Blog blog)
+        public UrlRecord()
         {
-            this.Slug = blog.createLinkFromTitle(blog.Title);
-            this.EntityId = blog.Id;
+            this.EntityName = "BlogPost";
+            this.IsActive = true;
+            this.LanguageId = 2;
+        }
+        
+        public UrlRecord(BlogPost blogPost)
+        {
+            this.EntityName = "BlogPost";
+            this.Slug = blogPost.createLinkFromTitle(blogPost.Title);
+            this.EntityId = blogPost.Id;
+            this.IsActive = true;
+            this.LanguageId = 2;
         }
     }
 }
