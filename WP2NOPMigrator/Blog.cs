@@ -5,6 +5,7 @@ namespace WP2NOPMigrator
 {
     public class Blog
     {
+        public int Id { get; set; }
         public string Title { get; set; }
 
         public string Body { get; set; }
@@ -43,6 +44,17 @@ namespace WP2NOPMigrator
             this.MetaDescription = wp.Meta.MetaDescription;
             this.CreatedOnUtc = wp.DateGMT;
         }
+        
+        public string createLinkFromTitle(string title)
+        {
+            return title.ToLower()
+                        .Replace(" ", "-")
+                        .Replace("đ", "dj")
+                        .Replace("ž", "z")
+                        .Replace("š", "s")
+                        .Replace("ć", "c")
+                        .Replace("č", "c");
+        }
 
         private void ConstructBody(WPBlog wp)
         {
@@ -62,7 +74,7 @@ namespace WP2NOPMigrator
             int lengthOffset = 0;
             foreach (Match match in regex.Matches(this.Body))
             {
-                string id = match.Groups[1].Value.ToLower().Replace(' ', '-');
+                string id = this.createLinkFromTitle(match.Groups[1].Value);
                 string idAttribute = $" id=\"{id}\"";
                 newBody = newBody.Insert(match.Index + 3 + lengthOffset, idAttribute);
                 lengthOffset += idAttribute.Length;
@@ -121,7 +133,8 @@ namespace WP2NOPMigrator
         private string ConstructLinks()
         {
             string newBody = this.Body;
-            return newBody.Replace("https://www.svezaimunitet.com", "");
+            return newBody.Replace("https://www.svezaimunitet.com", "")
+                          .Replace("/zdravlje-a-z", "");
         }
     }
 }
