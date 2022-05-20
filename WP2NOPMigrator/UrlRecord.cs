@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace WP2NOPMigrator
 {
     public class UrlRecord
@@ -23,8 +25,9 @@ namespace WP2NOPMigrator
         
         public UrlRecord(BlogPost blogPost)
         {
+            Regex bracketRegex = new Regex("\\(.*\\)");
             this.EntityName = "BlogPost";
-            this.Slug = blogPost.createLinkFromTitle(blogPost.Title);
+            this.Slug = blogPost.createLinkFromTitle(bracketRegex.Replace(blogPost.Title, "").Trim());
             this.EntityId = blogPost.Id;
             this.IsActive = true;
             this.LanguageId = 2;
