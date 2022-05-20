@@ -5,88 +5,35 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using WP2NOPMigrator;
 
+Console.WriteLine("Initializing Migrator");
 string wordpressConnectionString = "Server=localhost;Database=sandzako;User=root;Password=admin;";
 
-List<WPBlog> blogs = new();
-using (var connection = new MySqlConnection(wordpressConnectionString))
-{
-    connection.Open();
-    var query = "Select * from wp_posts as p left join wp_postmeta m on p.id = m.post_id where p.post_type = 'post'";
-    using (var command = new MySqlCommand(query, connection))
-    {
-        using (var reader = command.ExecuteReader())
-        {
-            while (reader.Read())
-            {
-                var blog = new WPBlog
-                {
-                    Id = reader.GetInt32(reader.GetOrdinal("ID")),
-                    Title = reader.GetString(reader.GetOrdinal("post_title")),
-                    Content = reader.GetString(reader.GetOrdinal("post_content")),
-                    Excerpt = reader.GetString(reader.GetOrdinal("post_excerpt")),
-                    DateGMT = reader.GetDateTime(reader.GetOrdinal("post_date_gmt")),
-                };
+Console.WriteLine("Loading Wordpress blog posts");
+List<WPBlog> wpBlogs = WPBlog.LoadBlogs(wordpressConnectionString);
+Console.WriteLine("Finished loading Wordpress blog posts");
+List<BlogPost> blogPosts = wpBlogs.Select((wp) => new BlogPost(wp)).ToList();
 
-                using (var metaConnection = new MySqlConnection(wordpressConnectionString))
-                {
-                    metaConnection.Open();
-                    var meta_query = $"Select * from wp_postmeta where post_id={blog.Id}";
-                    using (var metaCommand = new MySqlCommand(meta_query, metaConnection))
-                    {
-                        using (var metaReader = metaCommand.ExecuteReader())
-                        {
-                            var meta = new WPPostMeta();
-                            while (metaReader.Read())
-                            {
-                                string meta_key = metaReader.GetString(metaReader.GetOrdinal("meta_key"));
-                                switch (meta_key)
-                                {
-                                    case "_yoast_wpseo_title":
-                                        meta.MetaTitle = metaReader.GetString(metaReader.GetOrdinal("meta_value"));
-                                        break;
-                                    case "_yoast_wpseo_metadescription":
-                                        meta.MetaDescription =
-                                            metaReader.GetString(metaReader.GetOrdinal("meta_value"));
-                                        break;
-                                    case "reference":
-                                        meta.Reference =
-                                            metaReader.GetString(metaReader.GetOrdinal("meta_value"));
-                                        break;
-                                    
-                                    default:
-                                        if (meta_key.StartsWith("izdvojeni_tekstovi_"))
-                                        {
-                                            meta.FeaturedTexts.Add(
-                                                metaReader.GetString(metaReader.GetOrdinal("meta_value")));
-                                        }
-
-                                        break;
-                                }
-
-                                blog.Meta = meta;
-                            }
-                        }
-                    }
-                }
-
-                blogs.Add(blog);
-            }
-        }
-    }
-}
-
-var nblog = new BlogPost(blogs.First());
-
+Console.WriteLine("Initializing DB context");
 var dbContext = new NopDbContext();
-dbContext.BlogPosts.Add(nblog);
-dbContext.SaveChanges();
-var urlRecord = new UrlRecord(nblog);
-var activityLog = new ActivityLog(nblog.Id);
-dbContext.UrlRecords.Add(urlRecord);
-dbContext.ActivityLogs.Add(activityLog);
-dbContext.SaveChanges();
 
-Console.WriteLine(blogs.First().Meta.FeaturedTexts.Count);
+Console.WriteLine("Adding blog posts to NOP Commerce");
+foreach (var blogPost in blogPosts)
+{
+    dbContext.BlogPosts.Add(blogPost);
+}
+dbContext.SaveChanges();
+Console.WriteLine("Finished adding blog posts to NOP Commerce");
+Console.WriteLine("Adding URLs and Logs to NOP Commerce");
+foreach (var blogPost in blogPosts)
+{
+    var urlRecord = new UrlRecord(blogPost);
+    var activityLog = new ActivityLog(blogPost.Id);
+    dbContext.UrlRecords.Add(urlRecord);
+    dbContext.ActivityLogs.Add(activityLog);
+}
+dbContext.SaveChanges();
+Console.WriteLine("Finished adding URLs and Logs to NOP Commerce");
