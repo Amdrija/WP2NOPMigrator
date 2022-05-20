@@ -79,4 +79,5 @@ using (var connection = new MySqlConnection(wordpressConnectionString))
 }
 
 var nblog = new Blog(blogs.First());
+var urlRecord = new UrlRecord(nblog);
 Console.WriteLine(blogs.First().Meta.FeaturedTexts.Count);
