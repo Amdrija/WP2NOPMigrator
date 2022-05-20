@@ -14,7 +14,7 @@ List<WPBlog> blogs = new();
 using (var connection = new MySqlConnection(wordpressConnectionString))
 {
     connection.Open();
-    var query = "Select * from wp_posts as p left join wp_postmeta m on p.id = m.post_id where p.post_type = 'post' limit 1";
+    var query = "Select * from wp_posts as p left join wp_postmeta m on p.id = m.post_id where p.post_type = 'post'";
     using (var command = new MySqlCommand(query, connection))
     {
         using (var reader = command.ExecuteReader())
@@ -84,7 +84,9 @@ var dbContext = new NopDbContext();
 dbContext.BlogPosts.Add(nblog);
 dbContext.SaveChanges();
 var urlRecord = new UrlRecord(nblog);
+var activityLog = new ActivityLog(nblog.Id);
 dbContext.UrlRecords.Add(urlRecord);
+dbContext.ActivityLogs.Add(activityLog);
 dbContext.SaveChanges();
 
 Console.WriteLine(blogs.First().Meta.FeaturedTexts.Count);

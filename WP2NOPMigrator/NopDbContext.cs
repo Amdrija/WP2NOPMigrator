@@ -7,6 +7,8 @@ namespace WP2NOPMigrator
         public DbSet<BlogPost> BlogPosts { get; set; }
 
         public DbSet<UrlRecord> UrlRecords { get; set; }
+        
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -18,6 +20,7 @@ namespace WP2NOPMigrator
         {
             modelBuilder.Entity<BlogPost>().ToTable("BlogPost");
             modelBuilder.Entity<UrlRecord>().ToTable("UrlRecord");
+            modelBuilder.Entity<ActivityLog>().ToTable("ActivityLog");
         }
     }
 }
