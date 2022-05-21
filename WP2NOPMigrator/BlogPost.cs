@@ -38,7 +38,7 @@ namespace WP2NOPMigrator
         public BlogPost()
         {
             this.MetaKeywords = "";
-            this.LanguageId = 2;
+            this.LanguageId = 3;
             this.IncludeInSitemap = true;
             this.AllowComments = true;
             this.Tags = "";
@@ -53,7 +53,7 @@ namespace WP2NOPMigrator
             this.MetaKeywords = "";
             this.ConstructBody(wp);
             this.MetaTitle = wp.Meta.MetaTitle;
-            this.LanguageId = 2;
+            this.LanguageId = 3;
             this.IncludeInSitemap = true;
             this.BodyOverview = wp.Excerpt.Length > 0 ? wp.Excerpt : $"<p>{wp.Title}</p>";
             this.AllowComments = true;

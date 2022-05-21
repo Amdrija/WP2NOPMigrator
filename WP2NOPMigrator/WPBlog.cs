@@ -24,7 +24,7 @@ namespace WP2NOPMigrator
             using (var connection = new MySqlConnection(wordpressConnectionString))
             {
                 connection.Open();
-                var query = "Select * from wp_posts as p where p.post_type = 'post'";
+                var query = "Select * from wp_posts as p where p.post_type = 'post' AND NOT post_title LIKE '%Folna%';";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     using (var reader = command.ExecuteReader())
@@ -43,7 +43,7 @@ namespace WP2NOPMigrator
                             using (var metaConnection = new MySqlConnection(wordpressConnectionString))
                             {
                                 metaConnection.Open();
-                                var meta_query = $"Select * from wp_postmeta where post_id={blog.Id}";
+                                var meta_query = $"Select * from wp_postmeta where post_id={blog.Id};";
                                 using (var metaCommand = new MySqlCommand(meta_query, metaConnection))
                                 {
                                     using (var metaReader = metaCommand.ExecuteReader())

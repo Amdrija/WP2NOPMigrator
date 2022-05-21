@@ -20,7 +20,7 @@ namespace WP2NOPMigrator
         {
             this.EntityName = "BlogPost";
             this.IsActive = true;
-            this.LanguageId = 2;
+            this.LanguageId = 3;
         }
         
         public UrlRecord(BlogPost blogPost)
@@ -30,7 +30,7 @@ namespace WP2NOPMigrator
             this.Slug = blogPost.createLinkFromTitle(bracketRegex.Replace(blogPost.Title, "").Trim());
             this.EntityId = blogPost.Id;
             this.IsActive = true;
-            this.LanguageId = 2;
+            this.LanguageId = 3;
         }
     }
 }
