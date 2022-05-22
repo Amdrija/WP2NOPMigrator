@@ -24,7 +24,7 @@ namespace WP2NOPMigrator
             using (var connection = new MySqlConnection(wordpressConnectionString))
             {
                 connection.Open();
-                var query = "Select * from wp_posts as p where p.post_type = 'post' AND NOT post_title LIKE '%Folna%';";
+                var query = "Select * from wp_posts as p where p.post_type = 'post' AND NOT post_title LIKE '%Folna%' AND post_title LIKE '%Crna Zova%' limit 1;";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     using (var reader = command.ExecuteReader())

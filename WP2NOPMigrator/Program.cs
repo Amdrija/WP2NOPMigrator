@@ -24,7 +24,7 @@ Console.WriteLine("Loading Wordpress blog posts");
 List<WPBlog> wpBlogs = WPBlog.LoadBlogs(wordpressConnectionString);
 Console.WriteLine("Finished loading Wordpress blog posts");
 List<BlogPost> blogPosts = wpBlogs.Select((wp) => new BlogPost(wp)).ToList();
-
+List<Picture> pictures = new();
 Console.WriteLine("Initializing DB context");
 
 var contextOptions = new DbContextOptionsBuilder<NopDbContext>()
@@ -35,6 +35,8 @@ var dbContext = new NopDbContext(contextOptions);
 Console.WriteLine("Adding blog posts to NOP Commerce");
 foreach (var blogPost in blogPosts)
 {
+    pictures.AddRange( blogPost.ConstructImages());
+    dbContext.Pictures.AddRange(pictures);
     dbContext.BlogPosts.Add(blogPost);
 }
 dbContext.SaveChanges();
@@ -47,5 +49,8 @@ foreach (var blogPost in blogPosts)
     dbContext.UrlRecords.Add(urlRecord);
     dbContext.ActivityLogs.Add(activityLog);
 }
+
+List<PictureBinary> pictureBinaries = pictures.Select(p => new PictureBinary(p)).ToList();
+dbContext.AddRange(pictureBinaries);
 dbContext.SaveChanges();
 Console.WriteLine("Finished adding URLs and Logs to NOP Commerce");
