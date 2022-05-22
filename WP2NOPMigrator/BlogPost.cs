@@ -79,9 +79,10 @@ namespace WP2NOPMigrator
         private void ConstructBody(WPBlog wp)
         {
             this.Body = this.ConstructTableOfContents();
-            this.Body = this.ConstructFeaturedText(wp);
             this.Body = this.ConstructReferences(wp);
+            this.Body = this.ConstructFeaturedText(wp);
             this.Body = this.ConstructLinks();
+            this.Body = WPAutoP.WpAutoP(this.Body);
         }
         
         private string ConstructTableOfContents()
