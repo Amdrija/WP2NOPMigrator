@@ -171,13 +171,9 @@ namespace WP2NOPMigrator
                 string imageName = match.Groups[1].Value.Split("/").Last();
                 string alt = match.Groups[2].Value;
                 int width = Int32.Parse(match.Groups[3].Value);
-                var picture = new Picture()
-                {
-                    SeoFileName = imageName.Split(".")[0],
-                    AltAttribute = alt,
-                    Url = match.Groups[1].Value
-                };
+                var picture = new Picture(imageName, alt, match.Groups[1].Value);
                 pictures.Add(picture);
+                
                 if (width > 1000)
                 {
                     this.Body = this.Body.Remove(match.Groups[3].Index + offset, $"width=\"{width}\"".Length)
@@ -189,7 +185,7 @@ namespace WP2NOPMigrator
                              "/" +
                              picture.SeoFileName +
                              (width > 1000 ? "_1000" : "") +
-                             ".jpeg";
+                             picture.Extension;
                 this.Body = this.Body.Replace(match.Groups[1].Value, 
                                     newSrc)
                                 .Replace($"height=\"{match.Groups[4].Value}\"", "");

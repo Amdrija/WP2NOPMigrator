@@ -8,7 +8,11 @@ namespace WP2NOPMigrator
     {
         public int Id { get; set; }
 
-        public string MimeType { get; set; }
+        public string MimeType
+        {
+            get;
+            set;
+        }
 
         public string SeoFileName { get; set; }
         
@@ -21,14 +25,31 @@ namespace WP2NOPMigrator
         public string VirtualPath { get; set; }
         
         public string Url { get; set; }
+        
+        public string Extension { get; set; }
+
+        private readonly Dictionary<string, string> mimeTypes = new Dictionary<string, string>()
+        {
+            { "jpg", "image/jpeg" },
+            {"jpeg", "image/jpeg"},
+            {"png", "image/png"}
+        };
 
         public Picture()
         {
-            this.MimeType = "image/jpeg";
             this.IsNew = false;
             this.VirtualPath = "~/images/uploaded";
         }
 
-        
+        public Picture(string imageName, string altAttribute, string url)
+        {
+            this.SeoFileName = imageName.Split(".")[0];
+            this.AltAttribute = altAttribute;
+            this.IsNew = false;
+            this.VirtualPath = "~/images/uploaded";
+            this.Url = url;
+            this.Extension = imageName.Split(".")[1];
+            this.MimeType = this.mimeTypes[this.Extension];
+        }
     }
 }

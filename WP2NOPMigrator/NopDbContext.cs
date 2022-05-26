@@ -27,7 +27,7 @@ namespace WP2NOPMigrator
             modelBuilder.Entity<Picture>().ToTable("Picture");
             modelBuilder.Entity<PictureBinary>().ToTable("PictureBinary");
 
-            modelBuilder.Entity<Picture>().Ignore(p => p.Url);
+            modelBuilder.Entity<Picture>().Ignore(p => p.Url).Ignore(p=> p.Extension);
         }
     }
 }
