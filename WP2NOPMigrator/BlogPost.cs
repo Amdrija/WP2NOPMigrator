@@ -166,31 +166,57 @@ namespace WP2NOPMigrator
             var imageRegex = new Regex("<img.*src=\\\"(.*)\\\" alt=\\\"(.*)\\\" width=\\\"(\\d+)\\\" height=\\\"(\\d+)\\\"\\ />");
             int offset = 0;
             List<Picture> pictures = new();
-            foreach (Match match in imageRegex.Matches(this.Body))
+            var matches = imageRegex.Matches(this.Body);
+            if (matches.Count > 0)
             {
-                string imageName = match.Groups[1].Value.Split("/").Last();
-                string alt = match.Groups[2].Value;
-                int width = Int32.Parse(match.Groups[3].Value);
-                var picture = new Picture(imageName, alt, match.Groups[1].Value);
-                pictures.Add(picture);
-                
-                if (width > 1000)
+                foreach (Match match in matches)
                 {
-                    this.Body = this.Body.Remove(match.Groups[3].Index + offset, $"width=\"{width}\"".Length)
-                                    .Insert(match.Groups[3].Index + offset, "width=\"1000\"");
-                    offset += "width=\"1000\"".Length - $"width=\"{width}\"".Length;
+                    string imageName = match.Groups[1].Value.Split("/").Last();
+                    string alt = match.Groups[2].Value;
+                    int width = Int32.Parse(match.Groups[3].Value);
+                    var picture = new Picture(imageName, alt, match.Groups[1].Value);
+                    pictures.Add(picture);
+
+                    if (width > 1000)
+                    {
+                        this.Body = this.Body.Remove(match.Groups[3].Index + offset, $"width=\"{width}\"".Length)
+                                        .Insert(match.Groups[3].Index + offset, "width=\"1000\"");
+                        offset += "width=\"1000\"".Length - $"width=\"{width}\"".Length;
+                    }
+
+                    var newSrc = picture.VirtualPath.Replace("~", "") +
+                                 "/" +
+                                 picture.SeoFileName +
+                                 (width > 1000 ? "_1000" : "") +
+                                 picture.Extension;
+                    this.Body = this.Body.Replace(
+                                        match.Groups[1].Value,
+                                        newSrc)
+                                    .Replace($"height=\"{match.Groups[4].Value}\"", "");
+                    offset += newSrc.Length - match.Groups[1].Length - $"height=\"{match.Groups[4].Value}\"".Length;
+
                 }
+            }
+            else
+            {
+                var imageRegex2 = new Regex("<img.*src=\\\"(.*)\\\" alt=\\\"(.*)\\\".*/>");
+                foreach (Match match in imageRegex2.Matches(this.Body))
+                {
+                    string imageName = match.Groups[1].Value.Split("/").Last();
+                    string alt = match.Groups[2].Value;
+                    var picture = new Picture(imageName, alt, match.Groups[1].Value);
+                    pictures.Add(picture);
 
-                var newSrc = picture.VirtualPath.Replace("~", "") +
-                             "/" +
-                             picture.SeoFileName +
-                             (width > 1000 ? "_1000" : "") +
-                             picture.Extension;
-                this.Body = this.Body.Replace(match.Groups[1].Value, 
-                                    newSrc)
-                                .Replace($"height=\"{match.Groups[4].Value}\"", "");
-                offset += newSrc.Length - match.Groups[1].Length - $"height=\"{match.Groups[4].Value}\"".Length;
+                    var newSrc = picture.VirtualPath.Replace("~", "") +
+                                 "/" +
+                                 picture.SeoFileName +
+                                 picture.Extension;
+                    this.Body = this.Body.Replace(
+                            match.Groups[1].Value,
+                                    newSrc);
+                    offset += newSrc.Length - match.Groups[1].Length;
 
+                }
             }
 
             return pictures;

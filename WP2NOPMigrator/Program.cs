@@ -54,3 +54,4 @@ List<PictureBinary> pictureBinaries = pictures.Select(p => new PictureBinary(p))
 dbContext.AddRange(pictureBinaries);
 dbContext.SaveChanges();
 Console.WriteLine("Finished adding URLs and Logs to NOP Commerce");
+Console.WriteLine("Finished");

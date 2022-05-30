@@ -30,9 +30,9 @@ namespace WP2NOPMigrator
 
         private readonly Dictionary<string, string> mimeTypes = new Dictionary<string, string>()
         {
-            { "jpg", "image/jpeg" },
-            {"jpeg", "image/jpeg"},
-            {"png", "image/png"}
+            { ".jpg", "image/jpeg" },
+            {".jpeg", "image/jpeg"},
+            {".png", "image/png"}
         };
 
         public Picture()
@@ -49,6 +49,7 @@ namespace WP2NOPMigrator
             this.VirtualPath = "~/images/uploaded";
             this.Url = url;
             this.Extension = imageName.Split(".")[1];
+            this.Extension = this.Extension == "jpg" ? ".jpeg" : "." + this.Extension;
             this.MimeType = this.mimeTypes[this.Extension];
         }
     }
